@@ -1,20 +1,29 @@
-const mysql = require('mysql2');
-
+// const mysql = require('mysql2');
+const sql = require('mssql');
+require('dotenv').config();
 // Krijo lidhjen me databazën
-const connection = mysql.createConnection({
-    host: 'localhost',      // Adresa e serverit MySQL
-    user: 'root',          // Përdoruesi i MySQL
-    password: 'therapypass',          // Fjalëkalimi i MySQL (vendos nëse ke një)
-    database: 'therapy_portal' // Emri i databazës
-});
+
+const dbConfig = {
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    server: process.env.DB_SERVER,
+    database: process.env.DB_DATABASE,
+    options: {
+        encrypt: false, // Use true if connecting to Azure
+        trustServerCertificate: true
+    }
+};
 
 // Lidhu me databazën
-connection.connect((err) => {
-    if (err) {
-        console.error('❌ Gabim në lidhjen me databazën:', err);
-        return;
+const connectDB = async () => {
+    try {
+        await sql.connect(dbConfig);
+        console.log("Connected to SQL Server");
+    } catch (error) {
+        console.error("Database connection failed:", error);
     }
-    console.log('✅ Lidhja me MySQL u realizua me sukses!');
-});
+};
+
+module.exports = { connectDB, sql };
 
 module.exports = connection;
